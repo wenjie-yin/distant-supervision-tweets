@@ -7,7 +7,7 @@ if len(sys.argv) < 2:
 fname = sys.argv[1]
 
 with open(fname, 'r') as fall, open(fname.replace('.json', '-eng.json'), 'w') as feng:
-    for line in fh:
+    for line in fall:
         line = line.strip()
         try:
             tweet = json.loads(line)
