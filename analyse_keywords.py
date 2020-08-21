@@ -51,6 +51,7 @@ criterion = KeywordCriterion(positive_negative)
 
 founta_overlap = category_annotation_overlap(founta_df, criterion)
 davidson_overlap = category_annotation_overlap(davidson_df, criterion)
+# get indexes e.g. overlap.groups[('neg', 2)]
 
 overlap_proportion(founta_overlap, founta_df)
 overlap_proportion(davidson_overlap, davidson_df)
