@@ -1,6 +1,7 @@
 from utils.keywords import *
 from methods import KeywordCriterion, DistantSupervisor
 import argparse
+import time
 
 
 if __name__ == "__main__":
@@ -14,4 +15,8 @@ if __name__ == "__main__":
     keyword_criterion = KeywordCriterion(positive_negative, name="pos_neg_emo")
     supervisor = DistantSupervisor(all_tweets_file, keyword_criterion)
 
-    supervisor.run()
+    started_time = time.time()
+    supervisor.run(append_evidence=True, print_progress=True)
+    finished_time = time.time()
+    print('finished. took {:.2f} seconds. '.format(finished_time - started_time))
+
