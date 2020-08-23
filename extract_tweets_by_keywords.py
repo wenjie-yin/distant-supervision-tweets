@@ -16,7 +16,7 @@ if __name__ == "__main__":
     supervisor = DistantSupervisor(all_tweets_file, keyword_criterion)
 
     started_time = time.time()
-    supervisor.run(append_evidence=True, print_progress=True)
+    supervisor.run(append_evidence=True, print_progress=False)
     finished_time = time.time()
     print('finished. took {:.2f} seconds. '.format(finished_time - started_time))
 

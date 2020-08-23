@@ -38,20 +38,21 @@ def overlap_proportion(overlap, dataset_df):
     return counts
 
 
-all_pos = load_json_as_df('2019-09-01-eng-pos_neg_emo-pos.json')
-counts_pos, evidence_num_pos = count_evidence(all_pos)
+if __name__ == "__main__":
+    all_pos = load_json_as_df('2019-09-01-eng-pos_neg_emo-pos.json')
+    counts_pos, evidence_num_pos = count_evidence(all_pos)
 
-all_neg = load_json_as_df('2019-09-01-eng-pos_neg_emo-neg.json')
-counts_neg, evidence_num_neg = count_evidence(all_neg)
+    all_neg = load_json_as_df('2019-09-01-eng-pos_neg_emo-neg.json')
+    counts_neg, evidence_num_neg = count_evidence(all_neg)
 
-founta_df = pd.read_csv("~/Projects/stage0/data/founta_mode_basic_3classes.csv")
-davidson_df = pd.read_csv("~/Projects/stage0/data/davidson_mode_basic.csv")
+    founta_df = pd.read_csv("~/Projects/stage0/data/founta_mode_basic_3classes.csv")
+    davidson_df = pd.read_csv("~/Projects/stage0/data/davidson_mode_basic.csv")
 
-criterion = KeywordCriterion(positive_negative)
+    criterion = KeywordCriterion(positive_negative)
 
-founta_overlap = category_annotation_overlap(founta_df, criterion)
-davidson_overlap = category_annotation_overlap(davidson_df, criterion)
-# get indexes e.g. overlap.groups[('neg', 2)]
+    founta_overlap = category_annotation_overlap(founta_df, criterion)
+    davidson_overlap = category_annotation_overlap(davidson_df, criterion)
+    # get indexes e.g. overlap.groups[('neg', 2)]
 
-overlap_proportion(founta_overlap, founta_df)
-overlap_proportion(davidson_overlap, davidson_df)
+    overlap_proportion(founta_overlap, founta_df)
+    overlap_proportion(davidson_overlap, davidson_df)
