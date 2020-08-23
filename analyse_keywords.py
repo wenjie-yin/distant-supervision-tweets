@@ -20,7 +20,7 @@ def count_evidence(df):
         for evidence in row['evidence']:
             counts[evidence] += 1
         evidence_numbers[len(row['evidence'])] += 1
-    return pd.Series(counts), pd.Series(evidence_numbers)
+    return pd.Series(counts).sort_values(ascending=False), pd.Series(evidence_numbers).sort_values(ascending=False)
 
 
 def category_annotation_overlap(dataset_df, criterion):
