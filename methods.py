@@ -82,27 +82,53 @@ class GroupCriterion(Criterion):
         self.mode = mode
 
     def categorise(self, tweet, return_evidence=True):
-        tweet_category = None
-        if return_evidence:
-            all_evidence = list()
-            for criterion in self.criteria:
-                category, evidence = criterion.categorise(tweet)
-                if tweet_category not in [None, category]:  # TODO: if category is not None; if self.mode == 'all'
-                    return None, None
-                tweet_category = category
-                all_evidence = all_evidence + evidence
 
-            return tweet_category, all_evidence
+        if self.mode == 'any':
+            tweet_category = None
+            if return_evidence:
+                all_evidence = list()
+                for criterion in self.criteria:
+                    category, evidence = criterion.categorise(tweet)
+                    if tweet_category not in [None, category]:
+                        return None, None
+                    tweet_category = category
+                    all_evidence = all_evidence + evidence
 
-        else:
-            for criterion in self.criteria:
-                category = criterion.categorise(tweet)
-                if tweet_category is not None:
-                    return None
-                tweet_category = category
-                break
+                return tweet_category, all_evidence
 
-            return tweet_category
+            else:
+                for criterion in self.criteria:
+                    category = criterion.categorise(tweet)
+                    if tweet_category not in [None, category]:
+                        return None, None
+                    tweet_category = category
+                    break
+
+                return tweet_category
+
+        elif self.mode == 'all':
+            tweet_category = None
+            if return_evidence:
+                all_evidence = list()
+                for criterion in self.criteria:
+                    category, evidence = criterion.categorise(tweet)
+                    if category is None or tweet_category not in [None, category]:
+                        return None, None
+                    tweet_category = category
+                    all_evidence = all_evidence + evidence
+
+                return tweet_category, all_evidence
+
+            else:
+                for criterion in self.criteria:
+                    category = criterion.categorise(tweet)
+                    if category is None or tweet_category not in [None, category]:
+                        return None, None
+                    tweet_category = category
+
+                return tweet_category
+
+
 
 
 class KeywordCriterion(Criterion):

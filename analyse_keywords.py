@@ -3,6 +3,9 @@ import pandas as pd
 from collections import defaultdict
 from methods import KeywordCriterion
 from utils.keywords import positive_negative
+import pickle
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 def load_json_as_df(filename):
@@ -39,11 +42,6 @@ def overlap_proportion(overlap, dataset_df):
 
 
 if __name__ == "__main__":
-    all_pos = load_json_as_df('2019-09-01-eng-pos_neg_emo-pos.json')
-    counts_pos, evidence_num_pos = count_evidence(all_pos)
-
-    all_neg = load_json_as_df('2019-09-01-eng-pos_neg_emo-neg.json')
-    counts_neg, evidence_num_neg = count_evidence(all_neg)
 
     founta_df = pd.read_csv("~/Projects/stage0/data/founta_mode_basic_3classes.csv")
     davidson_df = pd.read_csv("~/Projects/stage0/data/davidson_mode_basic.csv")
@@ -56,3 +54,23 @@ if __name__ == "__main__":
 
     overlap_proportion(founta_overlap, founta_df)
     overlap_proportion(davidson_overlap, davidson_df)
+
+    '''
+    all_pos = load_json_as_df('2019-09-01-eng-pos_neg_emo-pos.json')
+    counts_pos, evidence_num_pos = count_evidence(all_pos)
+
+    all_neg = load_json_as_df('2019-09-01-eng-pos_neg_emo-neg.json')
+    counts_neg, evidence_num_neg = count_evidence(all_neg)
+
+    '''
+
+    with open('all_counts.pkl', 'rb') as f:
+        all_counts = pickle.load(f)
+
+
+
+
+
+
+
+
