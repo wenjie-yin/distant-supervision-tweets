@@ -73,13 +73,17 @@ class Criterion:
 
 
 class GroupCriterion(Criterion):
-    def __init__(self, list_of_criteria, mode='any'):
+    def __init__(self, list_of_criteria, mode='any', name='Group'):
         super().__init__()
-        assert isinstance(list_of_criteria, list) and all(isinstance(criterion, Criterion)
-                                                          for criterion in list_of_criteria)
-        self.criteria = list_of_criteria()
+        assert all([isinstance(list_of_criteria, list),
+                   all(isinstance(c, Criterion) for c in list_of_criteria)])
+        categories = list_of_criteria[0].categories
+        assert all(c.categories == categories for c in list_of_criteria[1:])
+        self.criteria = list_of_criteria
+        self.categories = categories
         assert mode in ['all', 'any']
         self.mode = mode
+        self.name = name
 
     def categorise(self, tweet, return_evidence=True):
 
@@ -89,9 +93,10 @@ class GroupCriterion(Criterion):
                 all_evidence = list()
                 for criterion in self.criteria:
                     category, evidence = criterion.categorise(tweet)
-                    if tweet_category not in [None, category]:
-                        return None, None
-                    tweet_category = category
+                    if category is not None:
+                        if tweet_category not in [None, category]:
+                            return None, None
+                        tweet_category = category
                     all_evidence = all_evidence + evidence
 
                 return tweet_category, all_evidence
@@ -99,9 +104,10 @@ class GroupCriterion(Criterion):
             else:
                 for criterion in self.criteria:
                     category = criterion.categorise(tweet)
-                    if tweet_category not in [None, category]:
-                        return None, None
-                    tweet_category = category
+                    if category is not None:
+                        if tweet_category not in [None, category]:
+                            return None
+                        tweet_category = category
                     break
 
                 return tweet_category
@@ -129,20 +135,29 @@ class GroupCriterion(Criterion):
                 return tweet_category
 
 
-
-
 class KeywordCriterion(Criterion):
     def __init__(self, keywords, name='Keyword', consider_surrounding=False):
         super().__init__()
         self.name = name
-        self.keywords = keywords
+        self.consider_surrounding = consider_surrounding
+
+        if self.consider_surrounding:
+            self.keywords = dict()
+            for category in keywords.keys():
+                regexes = list()
+                for keyword in keywords[category]:
+                    regex = process_string_keyword(keyword)
+                    regexes.append(regex)
+                self.keywords[category] = regexes
+        else:
+            self.keywords = keywords
+
         self.categories = list(self.keywords.keys())
         self.num_of_categories = len(self.categories)
-        self.consider_surrounding = consider_surrounding
 
     def _keyword_in_tweet(self, keyword, tweet):
         if self.consider_surrounding:
-            return re.search(process_string_keyword(keyword), tweet) is not None
+            return re.search(keyword, tweet) is not None
         else:
             return keyword in tweet
 

@@ -1,5 +1,5 @@
 from utils.keywords import *
-from methods import KeywordCriterion, DistantSupervisor
+from methods import KeywordCriterion, GroupCriterion, DistantSupervisor
 import argparse
 import time
 
@@ -18,8 +18,11 @@ if __name__ == "__main__":
     append_evidence = args.append_evidence
     print_progress = args.print_progress
 
-    keyword_criterion = KeywordCriterion(positive_negative, name="pos_neg_emo")
-    supervisor = DistantSupervisor(all_tweets_file, keyword_criterion)
+    emoji_criterion = KeywordCriterion(emojis, name='emojis')
+    emoticon_criterion = KeywordCriterion(emoticons, consider_surrounding=True, name='emoticons')
+    emoji_emoticon_criterion = GroupCriterion([emoticon_criterion, emoji_criterion], name="emoji_emoticon")
+    # keyword_criterion = KeywordCriterion(positive_negative, name="pos_neg_emo")
+    supervisor = DistantSupervisor(all_tweets_file, emoji_emoticon_criterion)
 
     started_time = time.time()
     supervisor.run(append_evidence=append_evidence, print_progress=print_progress)
