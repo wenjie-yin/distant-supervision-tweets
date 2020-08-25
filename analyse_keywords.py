@@ -66,11 +66,3 @@ if __name__ == "__main__":
 
     with open('all_counts.pkl', 'rb') as f:
         all_counts = pickle.load(f)
-
-
-
-
-
-
-
-
