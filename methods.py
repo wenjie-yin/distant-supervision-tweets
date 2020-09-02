@@ -65,8 +65,8 @@ class DistantSupervisor:
 class Criterion:
     def __init__(self):
         self.name = 'Dummy'
-        self.categories = None
-        self.num_of_categories = None
+        self.categories = []
+        self.num_of_categories = len(self.categories)
 
     def categorise(self, tweet, return_evidence=True):
         raise NotImplementedError
@@ -93,11 +93,13 @@ class GroupCriterion(Criterion):
                 all_evidence = list()
                 for criterion in self.criteria:
                     category, evidence = criterion.categorise(tweet)
+                    if evidence is None:   # if there is a contradiction within any criterion.
+                        return None, None  # TODO: there is no equivalence of this for not use_evidence yet.
                     if category is not None:
                         if tweet_category not in [None, category]:
                             return None, None
                         tweet_category = category
-                    all_evidence = all_evidence + evidence
+                        all_evidence = all_evidence + evidence
 
                 return tweet_category, all_evidence
 
@@ -118,6 +120,8 @@ class GroupCriterion(Criterion):
                 all_evidence = list()
                 for criterion in self.criteria:
                     category, evidence = criterion.categorise(tweet)
+                    if evidence is None:   # if there is a contradiction within any criterion.
+                        return None, None  # TODO: there is no equivalence of this for not use_evidence yet.
                     if category is None or tweet_category not in [None, category]:
                         return None, None
                     tweet_category = category
@@ -143,11 +147,13 @@ class KeywordCriterion(Criterion):
 
         if self.consider_surrounding:
             self.keywords = dict()
+            self.orig_keywords = dict()
             for category in keywords.keys():
                 regexes = list()
                 for keyword in keywords[category]:
                     regex = process_string_keyword(keyword)
                     regexes.append(regex)
+                    self.orig_keywords[regex] = keyword
                 self.keywords[category] = regexes
         else:
             self.keywords = keywords
@@ -161,6 +167,12 @@ class KeywordCriterion(Criterion):
         else:
             return keyword in tweet
 
+    def _get_orig_keyword(self, keyword):
+        if self.consider_surrounding:
+            return self.orig_keywords[keyword]
+        else:
+            return keyword
+
     def categorise(self, tweet, return_evidence=True):
         tweet_category = None
         if return_evidence:
@@ -171,7 +183,7 @@ class KeywordCriterion(Criterion):
                         if tweet_category not in [None, category]:
                             return None, None
                         tweet_category = category
-                        evidence.append(keyword)
+                        evidence.append(self._get_orig_keyword(keyword))
 
             return tweet_category, evidence
 
@@ -190,3 +202,5 @@ class KeywordCriterion(Criterion):
 def process_string_keyword(string):
     escaped = re.escape(string)
     return "(\s|\A)" + escaped + "(\s|\Z)"
+
+

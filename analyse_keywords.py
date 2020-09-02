@@ -1,11 +1,11 @@
 import json
 import pandas as pd
 from collections import defaultdict
-from methods import KeywordCriterion
-from utils.keywords import positive_negative
+from methods import KeywordCriterion, GroupCriterion
+from utils.keywords import *
 import pickle
-import seaborn as sns
-import matplotlib.pyplot as plt
+import glob
+import re
 
 
 def load_json_as_df(filename):
@@ -66,3 +66,32 @@ if __name__ == "__main__":
 
     with open('all_counts.pkl', 'rb') as f:
         all_counts = pickle.load(f)
+
+    o_files = glob.glob("semeval-tweets-2013-2017/semeval_official/GOLD/Subtask_A/twitter-*.txt")
+    df_list = list()
+    for file in o_files:
+        df = pd.read_table(file, header=None, names=['tweet_id', 'label', 'text'], index_col=False)
+        set_name = file.split('/')[-1].split('-')[1]
+        name_split = re.split(r'([0-9]+)([a-z]+)', set_name)
+        df['year'] = name_split[1]
+        df['split'] = name_split[2]
+        df_list.append(df)
+    all_semeval = pd.concat(df_list).rename(columns={'text': 'tweet', 'label': 'class'})
+
+    train_semeval = all_semeval[all_semeval['split'] == 'train']
+
+    emoji_criterion = KeywordCriterion(emojis, name='emojis')
+    emoticon_criterion = KeywordCriterion(emoticons, consider_surrounding=True, name='emoticons')
+    emoji_emoticon_criterion = GroupCriterion([emoticon_criterion, emoji_criterion], name="emoji_emoticon")
+
+    semeval_overlap = category_annotation_overlap(train_semeval, emoji_emoticon_criterion)
+    overlap_proportion(semeval_overlap, train_semeval)
+
+    count_evidence(semeval_overlap.get_group(('neg', 'positive')))
+
+    for year in ['2013', '2015', '2016']:
+        single_year_df = train_semeval[train_semeval['year'] == year]
+        single_year_overlap = category_annotation_overlap(single_year_df, emoji_emoticon_criterion)
+        print(year + '\n')
+        print(overlap_proportion(single_year_overlap, single_year_df))
+
