@@ -63,9 +63,9 @@ class DistantSupervisor:
 
 
 class Criterion:
-    def __init__(self):
-        self.name = 'Dummy'
-        self.categories = []
+    def __init__(self, **kwargs):
+        self.name = kwargs.get('name', 'Dummy')
+        self.categories = kwargs.get('categories', [])
         self.num_of_categories = len(self.categories)
 
     def categorise(self, tweet, return_evidence=True):
@@ -73,7 +73,7 @@ class Criterion:
 
 
 class GroupCriterion(Criterion):
-    def __init__(self, list_of_criteria, mode='any', name='Group'):
+    def __init__(self, list_of_criteria, **kwargs):
         super().__init__()
         assert all([isinstance(list_of_criteria, list),
                    all(isinstance(c, Criterion) for c in list_of_criteria)])
@@ -81,9 +81,10 @@ class GroupCriterion(Criterion):
         assert all(c.categories == categories for c in list_of_criteria[1:])
         self.criteria = list_of_criteria
         self.categories = categories
-        assert mode in ['all', 'any']
-        self.mode = mode
-        self.name = name
+
+        self.mode = kwargs.get('mode', 'any')
+        self.name = kwargs.get('name', 'Group')
+        assert self.mode in ['all', 'any']
 
     def categorise(self, tweet, return_evidence=True):
 
@@ -140,12 +141,16 @@ class GroupCriterion(Criterion):
 
 
 class KeywordCriterion(Criterion):
-    def __init__(self, keywords, name='Keyword', consider_surrounding=False):
+    def __init__(self, keywords, **kwargs):
         super().__init__()
-        self.name = name
-        self.consider_surrounding = consider_surrounding
 
-        if self.consider_surrounding:
+        self.name = kwargs.get('name', 'Keyword')
+        self.keyword_mode = kwargs.get('keyword_mode', 'in')
+        assert self.keyword_mode in ['in', 'split', 'regex']
+        if kwargs.get('consider_surrounding', False):
+            self.keyword_mode = 'regex'
+
+        if self.keyword_mode == 'regex':
             self.keywords = dict()
             self.orig_keywords = dict()
             for category in keywords.keys():
@@ -162,13 +167,15 @@ class KeywordCriterion(Criterion):
         self.num_of_categories = len(self.categories)
 
     def _keyword_in_tweet(self, keyword, tweet):
-        if self.consider_surrounding:
+        if self.keyword_mode == 'regex':
             return re.search(keyword, tweet) is not None
+        elif self.keyword_mode == 'split':
+            return keyword in tweet.split()
         else:
             return keyword in tweet
 
     def _get_orig_keyword(self, keyword):
-        if self.consider_surrounding:
+        if self.keyword_mode == 'regex':
             return self.orig_keywords[keyword]
         else:
             return keyword

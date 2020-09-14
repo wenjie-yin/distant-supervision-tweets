@@ -18,10 +18,9 @@ if __name__ == "__main__":
     append_evidence = args.append_evidence
     print_progress = args.print_progress
 
-    emoji_criterion = KeywordCriterion(emojis, name='emojis')
-    emoticon_criterion = KeywordCriterion(emoticons, consider_surrounding=True, name='emoticons')
+    emoji_criterion = KeywordCriterion(emojis)
+    emoticon_criterion = KeywordCriterion(emoticons, keyword_mode='split')
     emoji_emoticon_criterion = GroupCriterion([emoticon_criterion, emoji_criterion], name="emoji_emoticon")
-    # keyword_criterion = KeywordCriterion(positive_negative, name="pos_neg_emo")
     supervisor = DistantSupervisor(all_tweets_file, emoji_emoticon_criterion)
 
     started_time = time.time()
