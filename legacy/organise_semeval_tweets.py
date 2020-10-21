@@ -30,4 +30,4 @@ for file in o_files:
         print(set_name)
 
 all_not_found = pd.concat(not_found_list)
-all_found = pd.concat(found_list)
+all_found = pd.concat(found_list).rename(columns={"label": "class", "text": "tweet"})
