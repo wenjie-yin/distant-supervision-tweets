@@ -7,7 +7,6 @@ import pickle
 import glob
 import re
 
-
 def load_json_as_df(filename):
     all_dicts = []
     with open(filename) as f:
@@ -24,7 +23,6 @@ def count_evidence(df):
             counts[evidence] += 1
         evidence_numbers[len(row['evidence'])] += 1
     return pd.Series(counts).sort_values(ascending=False), pd.Series(evidence_numbers).sort_values(ascending=False)
-
 
 def category_annotation_overlap(dataset_df, criterion):
     hits = dataset_df.apply(lambda x: criterion.categorise(x['tweet']),
