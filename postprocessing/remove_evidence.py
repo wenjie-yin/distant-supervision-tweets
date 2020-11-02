@@ -14,7 +14,7 @@ with open(input_filename, 'r') as fi, open(output_filename, 'w+', encoding='utf8
         evidence_list = tweet['evidence']
         for evidence in evidence_list:
             text = text.replace(evidence, '')
-        text = text.replace('\n', ' ').replace('\t', ' ')
+        text = ' '.join(text.split())
         text = text.lower()
         text = text.strip()
         fo.write(text + '\n')
