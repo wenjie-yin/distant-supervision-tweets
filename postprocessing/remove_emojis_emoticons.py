@@ -8,7 +8,9 @@ from utils.regexes import emoticon_regex, url_regex, username_regex
 # lower case, replace any space with white space, remove non-ascii, emoticon, username, url
 
 input_filename = sys.argv[1]
-output_filename = '{}-cleaned.txt'.format(input_filename.split('/')[-1].split('.')[-2])
+input_path = Path(input_filename)
+parent = str(input_path.parent)
+output_filename = '{}/{}-cleaned.txt'.format(parent, input_path.name.split('.')[-2])
 
 with open(input_filename, 'r') as fi, open(output_filename, 'wb') as fo:
     for line in fi:
