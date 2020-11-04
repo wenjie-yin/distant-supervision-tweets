@@ -3,7 +3,7 @@ import json
 import re
 from pathlib import Path
 sys.path.append(str(Path('~/Projects/distant-supervision-tweets/').expanduser()))
-from utils.regexes import emoticon_regex, url_regex, username_regex
+from utils.regexes import emoticon_regex, url_regex, username_regex, word_or_punct_regex
 
 # lower case, replace any space with white space, remove non-ascii, emoticon, username, url
 
@@ -22,6 +22,7 @@ with open(input_filename, 'r') as fi, open(output_filename, 'wb') as fo:
         text = re.sub(emoticon_regex, '', text)
         text = re.sub(url_regex, '', text)
         text = re.sub(username_regex, '', text)
+        text = ' '.join(re.findall(word_or_punct_regex, text))
         text = text.lower()
         text = text.strip()
         to_write = (text + '\n').encode('utf8')
