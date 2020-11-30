@@ -7,6 +7,7 @@ import pickle
 import glob
 import re
 
+
 def load_json_as_df(filename):
     all_dicts = []
     with open(filename) as f:
