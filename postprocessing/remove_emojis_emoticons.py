@@ -40,8 +40,10 @@ with open(input_filename, 'r') as fi, open(output_filename, 'wb') as fo:
 
         text = text.lower()
         text = text.strip()
-        to_write = (text + '\n').encode('utf8')
-        fo.write(to_write)
+
+        if bool(re.search("[a-z]", text)):
+            to_write = (text + '\n').encode('utf8')
+            fo.write(to_write)
 
 print('finished writing to {}'.format(output_filename))
 
