@@ -18,25 +18,22 @@ with open(input_filename, 'r') as fi, open(output_filename, 'wb') as fo:
             line = line.strip()
             tweet = json.loads(line)
             text = tweet['text']
+            if 'evidence' in tweet.keys():
+                evidence_list = tweet['evidence']
+                for evidence in evidence_list:
+                    text = text.replace(evidence, '')
         except json.decoder.JSONDecodeError:
             text = line
         text = ' '.join(text.split())
         text = text.encode('ascii', 'ignore').decode()
 
-        # using placeholders first, so that there is no interaction with the next step
-        text = re.sub(url_regex, 'aurlthatis', text)
-        text = re.sub(username_regex, 'auserthatis', text)
-
-        # this way potential emoticons can be separated from text before removing e.g. lol:(
-        text = ' '.join(re.findall(word_or_punct_regex, text))
         text = re.sub(emoticon_regex, '', text)
+        text = re.sub(url_regex, '<url>', text)
+        text = re.sub(username_regex, '<user>', text)
 
         # pad punctuations, then remove extra spaces
-        text = re.sub(r'([^\w\s])', r' \1 ', text)
+        text = re.sub(r'([#:\"\'.,!?()])', r' \1 ', text)
         text = re.sub('\s{2,}', ' ', text)
-
-        text = text.replace('aurlthatis', '<url>')
-        text = text.replace('auserthatis', '<user>')
 
         text = text.lower()
         text = text.strip()
