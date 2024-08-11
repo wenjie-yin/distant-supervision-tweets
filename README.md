@@ -1,3 +1,8 @@
+
+# technical report
+a longitudinal twitter sentiment dataset collected using this tool and its analysis can be found [here](https://arxiv.org/pdf/2108.13898).
+
+# files
 ## methods.py
 contains:
   - Criterion: a criterion to judge whether a single text sentence falls into any of the possible categories.
